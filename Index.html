@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        #chatWindow {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        #messageInput {
+            width: calc(100% - 90px);
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            padding: 8px;
+            margin: 5px;
+            background-color: #e9e9e9;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .message.user {
+            background-color: #d1f7c4;
+        }
+
+        .message.bot {
+            background-color: #f0f0f0;
+        }
+
+        .note {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Chat Application</h1>
+
+    <!-- Chat Window -->
+    <div id="chatWindow">
+        <!-- Messages will appear here -->
+    </div>
+
+    <!-- Input and Button -->
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <p class="note">Note: Chat messages are saved in your browser. Refresh to see history.</p>
+
+    <script>
+        // Function to send a message and add it to the chat window
+        function sendMessage() {
+            var message = document.getElementById('messageInput').value.trim();
+            if (message !== "") {
+                // Create a new message object
+                var messageObj = {
+                    text: message,
+                    sender: "user",
+                    time: new Date().toLocaleTimeString()
+                };
+
+                // Save the message in localStorage
+                var chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+                chatHistory.push(messageObj);
+                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+
+                // Clear the message input field
+                document.getElementById('messageInput').value = "";
+
+                // Display the updated chat
+                displayChat();
+            }
+        }
+
+        // Function to display chat messages
+        function displayChat() {
+            var chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            var chatWindow = document.getElementById('chatWindow');
+            chatWindow.innerHTML = "";  // Clear chat window before displaying new content
+
+            chatHistory.forEach(function (message) {
+                // Create a new message element
+                var messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                if (message.sender === 'user') {
+                    messageElement.classList.add('user');
+                } else {
+                    messageElement.classList.add('bot');
+                }
+
+                // Set the message text and time
+                messageElement.innerHTML = `<strong>${message.sender}</strong> (${message.time}): ${message.text}`;
+                chatWindow.appendChild(messageElement);
+            });
+
+            // Scroll to the bottom of the chat window to show the latest message
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Initialize the chat window with chat history
+        window.onload = function () {
+            displayChat();
+        };
+    </script>
+</body>
+</html>
